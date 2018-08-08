@@ -8,11 +8,13 @@ namespace tree
     {
         static void Main(string[] args)
         {
-            var tree = new BinarySearchTree<int>();
-            tree.Build(new int[] { 2, 1, 5, 3, 10, 9 });
-            var node = tree.Search(5);
-            tree.Delete(node);
-            System.IO.File.WriteAllText("graph.gv", DotUtils<int>.generateDotString(tree.Root));
+            var tree = new RedBlackTree<double>();
+            tree.Build(new double[] { 11, 2, 1, 7, 5, 8, 14, 15 });
+            tree.Insert(6);
+            tree.Insert(13);
+            tree.Insert(13.5);
+            string text = RBUtils<double>.generateDotString(tree.Root, tree.SentryNode);
+            System.IO.File.WriteAllText("graph.gv", text);
         }
     }
 }
