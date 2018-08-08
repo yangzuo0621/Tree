@@ -62,7 +62,7 @@ namespace Tree.BST {
                 throw new ArgumentNullException();
             }
 
-            if (node.Right != null) {
+            if (node.Right != _SentryNode) {
                 return _Maximum(node.Right);
             }
 
@@ -80,7 +80,7 @@ namespace Tree.BST {
                 throw new ArgumentNullException();
             }
 
-            if (node.Left != null) {
+            if (node.Left != _SentryNode) {
                 return _Maximum(node.Left);
             }
 
@@ -93,12 +93,44 @@ namespace Tree.BST {
             return parent;
         }
 
-        private RBTreeNode<T> Left_Rotate(RBTreeNode<T> node) {
-            throw new NotImplementedException();
+        private void Left_Rotate(RBTreeNode<T> node) {
+            var rightChild = node.Right;
+            node.Right = rightChild.Left;
+            if (rightChild.Left != _SentryNode) {
+                rightChild.Left.Parent = node;
+            }
+            rightChild.Parent = node.Parent;
+            if (node.Parent == _SentryNode) {
+                _Root = rightChild;
+            } else {
+                if (node.Parent.Left == node) {
+                    node.Parent.Left = rightChild;
+                } else {
+                    node.Parent.Right = rightChild;
+                }
+            }
+            rightChild.Left = node;
+            node.Parent = rightChild;
         }
 
-        private RBTreeNode<T> Right_Rotate(RBTreeNode<T> node) {
-            throw new NotImplementedException();
+        private void Right_Rotate(RBTreeNode<T> node) {
+            var leftChild = node.Left;
+            node.Left = leftChild.Right;
+            if (leftChild.Right != null) {
+                leftChild.Right.Parent = node;
+            }
+            leftChild.Parent = node.Parent;
+            if (node.Parent == _SentryNode) {
+                _Root = leftChild;
+            } else {
+                if (node.Parent.Left == node) {
+                    node.Parent.Left = leftChild;
+                } else {
+                    node.Parent.Right = leftChild;
+                }
+            }
+            leftChild.Right = node;
+            node.Parent = leftChild;
         }
 
         public RBTreeNode<T> Root {
