@@ -141,18 +141,6 @@ namespace Tree.BST
             return parent;
         }
 
-        public void InOrder() {
-            InOrder(_Root);
-        }
-
-        private void InOrder(BSTTreeNode<T> root) {
-            if (root != null) {
-                InOrder(root.Left);
-                Console.WriteLine(root.Value);
-                InOrder(root.Right);
-            }
-        }
-
         public BSTTreeNode<T> Root { 
             get {
                 return _Root; 
