@@ -4,10 +4,15 @@ using System.Collections.Generic;
 namespace Tree.BST {
     public class RedBlackTree<T> where T : IComparable<T> {
 
-        public RedBlackTree() { }
+        public RedBlackTree() {
+            _SentryNode = new RBTreeNode<T>(RBColor.BLACK);
+            _Root = _SentryNode;
+        }
 
         public RedBlackTree(IEnumerable<T> collections)
         {
+            _SentryNode = new RBTreeNode<T>(RBColor.BLACK);
+            _Root = _SentryNode;
             Build(collections);
         }
 
@@ -22,7 +27,32 @@ namespace Tree.BST {
         }
 
         public void Insert(T key) {
-            throw new NotImplementedException();
+            var parent = _SentryNode;
+            var current = _Root;
+            while (current != _SentryNode) {
+                parent = current;
+                if (current.Value.CompareTo(key) > 0) {
+                    current = current.Left;
+                } else {
+                    current = current.Right;
+                }
+            }
+            var node = new RBTreeNode<T>(key);
+            node.Parent = parent;
+            if (parent == _SentryNode) {
+                _Root = node;
+            } else {
+                if (parent.Value.CompareTo(key) > 0) {
+                    parent.Left = node;
+                } else {
+                    parent.Right = node;
+                }
+            }
+            node.Left = _SentryNode;
+            node.Right = _SentryNode;
+            node.Color = RBColor.RED;
+
+            RBInsertFixUp(node);
         }
 
         public void Delete(RBTreeNode<T> node) {
@@ -31,7 +61,7 @@ namespace Tree.BST {
 
         public RBTreeNode<T> Search(T key) {
             var current = _Root;
-            while (current != null && current.Value.CompareTo(key) != 0) {
+            while (current != _SentryNode && current.Value.CompareTo(key) != 0) {
                 if (current.Value.CompareTo(key) > 0) {
                     current = current.Left;
                 } else {
@@ -93,7 +123,31 @@ namespace Tree.BST {
             return parent;
         }
 
-        private void Left_Rotate(RBTreeNode<T> node) {
+        public void InOrder() {
+            InOrderHelper(_Root);
+        }
+
+        private void InOrderHelper(RBTreeNode<T> root) {
+            if (root != _SentryNode) {
+                InOrderHelper(root.Left);
+                Console.WriteLine(root.Value);
+                InOrderHelper(root.Right);
+            }
+        }
+
+        public RBTreeNode<T> Root {
+            get {
+                return _Root;
+            }
+        }
+
+        public RBTreeNode<T> SentryNode {
+            get {
+                return _SentryNode;
+            }
+        }
+
+        private void LeftRotate(RBTreeNode<T> node) {
             var rightChild = node.Right;
             node.Right = rightChild.Left;
             if (rightChild.Left != _SentryNode) {
@@ -113,7 +167,7 @@ namespace Tree.BST {
             node.Parent = rightChild;
         }
 
-        private void Right_Rotate(RBTreeNode<T> node) {
+        private void RightRotate(RBTreeNode<T> node) {
             var leftChild = node.Left;
             node.Left = leftChild.Right;
             if (leftChild.Right != null) {
@@ -133,20 +187,45 @@ namespace Tree.BST {
             node.Parent = leftChild;
         }
 
-        public RBTreeNode<T> Root {
-            get {
-                return _Root;
+        private void RBInsertFixUp(RBTreeNode<T> node) {
+            var current = node;
+            while (current.Parent.Color == RBColor.RED) {
+                if (current.Parent == current.Parent.Parent.Left) {
+                    var right = current.Parent.Parent.Right;
+                    if (right.Color == RBColor.RED) {
+                        current.Parent.Color = RBColor.BLACK;
+                        right.Color = RBColor.BLACK;
+                        current.Parent.Parent.Color = RBColor.RED;
+                        current = current.Parent.Parent;
+                    } else {
+                        if (current == current.Parent.Right) {
+                            current = current.Parent;
+                            LeftRotate(current);
+                        }
+                        current.Parent.Color = RBColor.BLACK;
+                        current.Parent.Parent.Color = RBColor.RED;
+                        RightRotate(current.Parent.Parent);
+                    }
+                } else {
+                    var left = current.Parent.Parent.Left;
+                    if (left.Color == RBColor.RED) {
+                        current.Parent.Color = RBColor.BLACK;
+                        left.Color = RBColor.BLACK;
+                        current.Parent.Parent.Color = RBColor.RED;
+                        current = current.Parent.Parent;
+                    } else {
+                        if (current == current.Parent.Left) {
+                            current = current.Parent;
+                            RightRotate(current);
+                        }
+                        current.Parent.Color = RBColor.BLACK;
+                        current.Parent.Parent.Color = RBColor.RED;
+                        LeftRotate(current.Parent.Parent);
+                    }
+                }
             }
+            _Root.Color = RBColor.BLACK;
         }
-
-        public RBTreeNode<T> SentryNode {
-            get {
-                return _SentryNode;
-            }
-        }
-
-        private RBTreeNode<T> _Root;
-        private RBTreeNode<T> _SentryNode = new RBTreeNode<T>(RBColor.BLACK);
 
         private RBTreeNode<T> _Maximum(RBTreeNode<T> node) {
             var current = node;
@@ -163,11 +242,16 @@ namespace Tree.BST {
             }
             return current;
         }
+
+        private RBTreeNode<T> _Root;
+        private RBTreeNode<T> _SentryNode;
     }
 
     public class RBTreeNode<T> where T : IComparable<T> {
-        public RBTreeNode(T t) => (Value, Color) = (t, RBColor.RED);
+        public RBTreeNode() { }
+        public RBTreeNode(T t) => (Value) = (t);
         public RBTreeNode(RBColor color) => (Color) = (color);
+        public RBTreeNode(T t, RBColor color) => (Value, Color) = (t, color); 
 
         public T Value { get; set; }
         public RBColor Color { get; set; }
