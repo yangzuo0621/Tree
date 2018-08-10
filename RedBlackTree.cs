@@ -56,7 +56,39 @@ namespace Tree.BST {
         }
 
         public void Delete(RBTreeNode<T> node) {
-            throw new NotImplementedException();
+            RBTreeNode<T> delNode = null;
+            if (node.Left == _SentryNode || node.Right == _SentryNode) {
+                delNode = node;
+            } else {
+                delNode = Successor(node);
+            }
+
+            RBTreeNode<T> child = null;
+            if (delNode.Left != _SentryNode) {
+                child = delNode.Left;
+            } else {
+                child = delNode.Right;
+            }
+
+            child.Parent = delNode.Parent;
+
+            if (delNode.Parent == _SentryNode) {
+                _Root = child;
+            } else {
+                if (delNode.Parent.Left == delNode) {
+                    delNode.Parent.Left = child;
+                } else {
+                    delNode.Parent.Right = child;
+                }
+            }
+
+            if (node != delNode) {
+                node.Value = delNode.Value;
+            }
+
+            if (delNode.Color == RBColor.BLACK) {
+                RBDeleteFixUp(child);
+            }
         }
 
         public RBTreeNode<T> Search(T key) {
@@ -225,6 +257,12 @@ namespace Tree.BST {
                 }
             }
             _Root.Color = RBColor.BLACK;
+        }
+
+        private void RBDeleteFixUp(RBTreeNode<T> node) {
+            while (node != _SentryNode && node.Color == RBColor.BLACK) {
+                
+            }
         }
 
         private RBTreeNode<T> _Maximum(RBTreeNode<T> node) {
