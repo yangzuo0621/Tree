@@ -259,10 +259,56 @@ namespace Tree.BST {
             _Root.Color = RBColor.BLACK;
         }
 
-        private void RBDeleteFixUp(RBTreeNode<T> node) {
+        private void RBDeleteFixUp(RBTreeNode<T> fixNode) {
+            var node = fixNode;
             while (node != _SentryNode && node.Color == RBColor.BLACK) {
-                
+                if (node == node.Parent.Left) {
+                    var right = node.Parent.Right;
+                    if (right.Color == RBColor.RED) {
+                        right.Color = RBColor.BLACK;
+                        node.Parent.Color = RBColor.RED;
+                        LeftRotate(node.Parent);
+                        right = node.Parent.Right;
+                    }
+                    if (right.Left.Color == RBColor.BLACK && right.Right.Color == RBColor.BLACK) {
+                        right.Color = RBColor.RED;
+                        node = node.Parent;
+                    } else if (right.Right.Color == RBColor.BLACK) {
+                        right.Left.Color = RBColor.BLACK;
+                        right.Color = RBColor.RED;
+                        RightRotate(right);
+                        right = node.Parent.Right;
+                    }
+                    right.Color = node.Parent.Color;
+                    node.Parent.Color = RBColor.BLACK;
+                    right.Right.Color = RBColor.BLACK;
+                    LeftRotate(node.Parent);
+                    node = _Root;
+                } else {
+                    var left = node.Parent.Left;
+                    if (left.Color == RBColor.RED) {
+                        left.Color = RBColor.BLACK;
+                        node.Parent.Color = RBColor.RED;
+                        RightRotate(node.Parent);
+                        left = node.Parent.Left;
+                    }
+                    if (left.Left.Color == RBColor.BLACK && left.Right.Color == RBColor.BLACK) {
+                        left.Color = RBColor.RED;
+                        node = node.Parent;
+                    } else if (left.Left.Color == RBColor.BLACK) {
+                        left.Right.Color = RBColor.BLACK;
+                        left.Color = RBColor.RED;
+                        LeftRotate(left);
+                        left = node.Parent.Left;
+                    }
+                    left.Color = node.Parent.Color;
+                    node.Parent.Color = RBColor.BLACK;
+                    left.Left.Color = RBColor.BLACK;
+                    RightRotate(node.Parent);
+                    node = _Root;
+                }
             }
+            node.Color = RBColor.BLACK;
         }
 
         private RBTreeNode<T> _Maximum(RBTreeNode<T> node) {
