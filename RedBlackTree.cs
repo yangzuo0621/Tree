@@ -125,7 +125,7 @@ namespace Tree.BST {
             }
 
             if (node.Right != _SentryNode) {
-                return _Maximum(node.Right);
+                return _Minimum(node.Right);
             }
 
             var current = node;
